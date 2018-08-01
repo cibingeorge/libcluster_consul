@@ -13,15 +13,11 @@ defmodule ClusterConsul.Strategy do
   end
 
   @impl GenServer
-  def init(opts) do
-    state = %State{
-      topology: Keyword.fetch!(opts, :topology),
-      connect: Keyword.fetch!(opts, :connect),
-      disconnect: Keyword.fetch!(opts, :disconnect),
-      list_nodes: Keyword.fetch!(opts, :list_nodes),
-      config: Keyword.fetch!(opts, :config),
-      meta: MapSet.new()
-    }
+  def init([%State{meta: nil} = state]) do
+    init([%State{state | :meta => MapSet.new()}])
+  end
+
+  def init([%State{} = state]) do
     name = Keyword.fetch!(state.config, :service_name)
     port = Keyword.get(state.config, :service_port, 0)
     _check = Keyword.fetch(state.config, :check)
